@@ -60,6 +60,7 @@
 #define LC_SEGMENT			0x1
 #define LC_SEGMENT_64			0x19
 #define LC_SYMTAB			0x2
+#define LC_BUILD_VERSION		0x32
 
 /* Symbol type bits */
 #define N_STAB				0xe0

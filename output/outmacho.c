@@ -64,6 +64,7 @@
 #define MACHO_SYMCMD_SIZE		24
 #define MACHO_NLIST_SIZE		12
 #define MACHO_RELINFO_SIZE		8
+#define MACHO_BUILDVERCMD_SIZE		24
 
 #define MACHO_HEADER64_SIZE		32
 #define MACHO_SEGCMD64_SIZE		72
@@ -1270,6 +1271,11 @@ static void macho_calculate_sizes (void)
         head_sizeofcmds += fmt.segcmd_size  + seg_nsects * fmt.sectcmd_size;
     }
 
+    if (1) {
+	++head_ncmds;
+	head_sizeofcmds += MACHO_BUILDVERCMD_SIZE;
+    }
+
     if (nsyms > 0) {
 	++head_ncmds;
 	head_sizeofcmds += MACHO_SYMCMD_SIZE;
@@ -1652,6 +1658,15 @@ static void macho_write (void)
 	offset = macho_write_segment (offset);
     else
         nasm_warn(WARN_OTHER, "no sections?");
+
+    if (1) {
+        fwriteint32_t(LC_BUILD_VERSION, ofile);
+        fwriteint32_t(MACHO_BUILDVERCMD_SIZE, ofile); /* size of load command */
+        fwriteint32_t(6, ofile);    /* platform */
+        fwriteint32_t(13 << 16, ofile);    /* minos (X.Y.Z is encoded in nibbles xxxx.yy.zz) */
+        fwriteint32_t(13 << 16, ofile);    /* sdk */
+        fwriteint32_t(0, ofile);    /* ntools */
+    }
 
     if (nsyms > 0) {
         /* write out symbol command */
