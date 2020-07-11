@@ -749,6 +749,7 @@ static const struct macho_known_section {
     { ".debug_info",    "__DWARF",  "__debug_info",     S_ATTR_DEBUG    },
     { ".debug_line",    "__DWARF",  "__debug_line",     S_ATTR_DEBUG    },
     { ".debug_str",     "__DWARF",  "__debug_str",      S_ATTR_DEBUG    },
+    { ".llvmasm",       "__LLVM",   "__asm",            S_REGULAR       },
 };
 
 /* Section type or attribute directives */
@@ -1704,6 +1705,17 @@ static void macho_cleanup(void)
     struct symbol *sym;
 
     dfmt->cleanup();
+
+    if (1) {
+        int bits = 0;
+        macho_section(".llvmasm", &bits);
+
+        struct section *p_section = NULL;
+        p_section = get_section_by_name("__LLVM", "__asm");
+        nasm_assert(p_section != NULL);
+
+        macho_output(p_section->index, "\0", OUT_RAWDATA, 1, NO_SEG, 0);
+    }
 
     /* Sort all symbols.  */
     macho_layout_symbols (&nsyms, &strslen);
